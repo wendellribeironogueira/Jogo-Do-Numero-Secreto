@@ -18,8 +18,8 @@ function exibirTextoNaTela(tag, texto) {
 }
 
 function exibirMensagemInicial() {
-    exibirTextoNaTela('h1', 'Advinhe o Número Secreto');
-    exibirTextoNaTela('p', 'Escolha um Número entre 1 e 10');
+    exibirTextoNaTela('h1', 'Você Está com Sorte? Descubra o Número Secreto!');
+    exibirTextoNaTela('p', 'Escolha um Número Entre 1 e 10:');
 }
 exibirMensagemInicial();
 

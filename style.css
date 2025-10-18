@@ -61,6 +61,7 @@ body::before {
 
 .container__texto {
     margin-bottom: 1.5rem;
+    text-align: center; /* 🔹 Centraliza h1 e p */
 }
 
 .container__texto-azul {
