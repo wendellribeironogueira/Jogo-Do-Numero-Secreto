@@ -10,7 +10,7 @@
         href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Inter:wght@400;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <title>JS Game</title>
+    <title>Jogo do Número Secreto — Wendell Ribeiro</title>
 </head>
 
 <body>
@@ -23,7 +23,11 @@
                     <p class="texto__paragrafo">Escolha um número entre 1 e 10</p>
                 </div>
 
-                <input type="number" min="1" max="10" class="container__input" placeholder="Digite seu palpite">
+                <!-- ✅ Input com label acessível -->
+                <label for="chute" class="sr-only">Digite um número entre 1 e 10</label>
+                <input id="chute" type="number" min="1" max="10"
+                    class="container__input" placeholder="Digite seu palpite" required>
+
                 <div class="chute container__botoes">
                     <button onclick="verificarChute()" class="container__botao">Chutar</button>
                     <button onclick="reiniciarJogo()" id="reiniciar" class="container__botao" disabled>Novo jogo</button>

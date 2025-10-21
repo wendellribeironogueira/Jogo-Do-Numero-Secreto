@@ -1,72 +1,115 @@
-let numeroLimite = 10;
+// 🎯 Configurações gerais
+const config = {
+    numeroLimite: 10,
+    vozAtiva: true,
+    taxaDeVoz: 1.6
+};
+
+// 🧮 Variáveis de estado
 let numeroSorteado = [];
 let numeroSecreto = gerarNumeroAleatorio();
 let tentativas = 1;
-console.log (numeroSecreto);
 
+// 🚀 Inicialização
+inicializarJogo();
+
+function inicializarJogo() {
+    exibirMensagemInicial();
+    console.log(`Número secreto: ${numeroSecreto}`); // útil para testes
+}
+
+// 🗣️ Função de voz separada
+function falar(texto) {
+    if (config.vozAtiva && 'speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(texto);
+        utterance.lang = 'pt-BR';
+        utterance.rate = config.taxaDeVoz;
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+// 🧾 Exibição centralizada
 function exibirTextoNaTela(tag, texto) {
-    let campo = document.querySelector(tag);
+    const campo = document.querySelector(tag);
     campo.innerHTML = texto;
-    if ('speechSynthesis' in window) {
-        let utterance = new SpeechSynthesisUtterance(texto);
-        utterance.lang = 'pt-BR'; 
-        utterance.rate = 1.7; 
-        window.speechSynthesis.speak(utterance); 
-    } else {
-        console.log("Web Speech API não suportada neste navegador.");
-    }
+    falar(texto);
 }
 
+// 🧠 Mensagem inicial
 function exibirMensagemInicial() {
-    exibirTextoNaTela('h1', 'Você Está com Sorte? Descubra o Número Secreto!');
-    exibirTextoNaTela('p', 'Escolha um Número Entre 1 e 10:');
+    exibirTextoNaTela('h1', 'Você está com sorte? Descubra o número secreto!');
+    exibirTextoNaTela('p', `Escolha um número entre 1 e ${config.numeroLimite}:`);
 }
-exibirMensagemInicial();
 
+// 🧩 Lógica principal
 function verificarChute() {
-    let chute = document.querySelector ('input').value;
-    if (chute == numeroSecreto) {
-        exibirTextoNaTela ('h1', `Você Acertou! O Número Secreto é ${numeroSecreto}`);
-        let palavraTentativas = tentativas > 1 ? 'tentativas' : 'tentativa';
-        let mensagemTentativas = `Você Descobriu o Número Secreto com ${tentativas} ${palavraTentativas}!`; 
-                exibirTextoNaTela('p', mensagemTentativas);
-        document.getElementById ('reiniciar').removeAttribute ('disabled');
-    } else if (chute > numeroSecreto) {
-        exibirTextoNaTela ('h1', 'Você Não Acertou!');
-        exibirTextoNaTela ('p', 'O Número Secreto é Menor que o Chute!');
-    } else if (chute < numeroSecreto) {
-        exibirTextoNaTela ('h1', 'Você Não Acertou!');
-        exibirTextoNaTela ('p', 'O Número Secreto é Maior que o Chute!');
+    const input = document.querySelector('input');
+    const chute = Number(input.value);
+
+    // 🔍 Validação de entrada
+    if (!chute || chute < 1 || chute > config.numeroLimite) {
+        exibirTextoNaTela('p', `⚠️ Digite um número entre 1 e ${config.numeroLimite}.`);
+        input.focus();
+        return;
     }
-    tentativas++;
+
+    if (chute === numeroSecreto) {
+        exibirTextoNaTela('h1', `🎉 Você acertou!`);
+        const palavraTentativas = tentativas > 1 ? 'tentativas' : 'tentativa';
+        const mensagemTentativas = `O número secreto era ${numeroSecreto}. Você descobriu com ${tentativas} ${palavraTentativas}.`;
+        exibirTextoNaTela('p', mensagemTentativas);
+
+        tocarSom('acerto');
+        document.getElementById('reiniciar').removeAttribute('disabled');
+    } else {
+        const dica = chute > numeroSecreto ? 'menor' : 'maior';
+        exibirTextoNaTela('h1', 'Você não acertou 😢');
+        exibirTextoNaTela('p', `O número secreto é ${dica} que ${chute}.`);
+        tocarSom('erro');
+        tentativas++;
+    }
+
     limparCampo();
 }
 
-function gerarNumeroAleatorio (){
-    let numeroEscolhido = parseInt(Math.random() * numeroLimite + 1);
-    let quantidadeDeElementosLista = numeroSorteado.length;
+// 🎲 Geração de número secreto sem repetição
+function gerarNumeroAleatorio() {
+    const numero = Math.floor(Math.random() * config.numeroLimite) + 1;
 
-    if (quantidadeDeElementosLista == numeroLimite) {
+    if (numeroSorteado.length === config.numeroLimite) {
         numeroSorteado = [];
     }
-    if (numeroSorteado.includes(numeroEscolhido)) {
+
+    if (numeroSorteado.includes(numero)) {
         return gerarNumeroAleatorio();
     } else {
-        numeroSorteado.push(numeroEscolhido);
-        return numeroEscolhido;
+        numeroSorteado.push(numero);
+        return numero;
     }
 }
 
-function limparCampo () {
-    chute = document.querySelector ('input');
-    chute.value = '';
+// 🧹 Limpa o campo de input
+function limparCampo() {
+    const input = document.querySelector('input');
+    input.value = '';
+    input.focus();
 }
 
+// 🔁 Reinicia o jogo
 function reiniciarJogo() {
     numeroSecreto = gerarNumeroAleatorio();
-    limparCampo();
     tentativas = 1;
+    limparCampo();
     exibirMensagemInicial();
-    document.getElementById ('reiniciar').setAttribute ('disabled', true);
+    document.getElementById('reiniciar').setAttribute('disabled', true);
 }
 
+// 🔊 Sons de feedback (acerto/erro)
+function tocarSom(tipo) {
+    const sons = {
+        acerto: 'https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg',
+        erro: 'https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg'
+    };
+    const som = new Audio(sons[tipo]);
+    som.play().catch(() => {}); // ignora erro caso bloqueado pelo navegador
+}
